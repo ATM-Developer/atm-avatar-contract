@@ -36,7 +36,13 @@ contract Avatar is Ownable, ERC721{
 
     function mint(address to, uint256 n) public {
         require(add(supply, n) <= limit, "Avatar: out-of-limit");
-        IERC20(luca).transferFrom(msg.sender, address(this), mul(n, price));
+
+        uint256 amt = mul(n, price);
+
+        IERC20(luca).transferFrom(msg.sender, address(this), amt);
+
+        IERC20(luca).transfer(address(0), amt / 2);
+
         for (uint256 i=0; i< n; i++){
             supply++;
             _mint(to, supply);
