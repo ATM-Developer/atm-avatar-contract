@@ -1,38 +1,41 @@
 # atm-avatar-contract
 
-## introduction
-**Avatar Link** is a new Link, different with ATM Link. the link is not a contract, and NFT don't have to deposit on
-any contract. the link just a data struct to record which two Avatar NFT connected.  One Avatar NFT can connect to many
-other Avatar NFT.  
+## introduction 
+
+    Avatar Link is a new Link, different with ATM Link. the link is not a contract, and NFT don't have to deposit on
+    any contract. the link just a data struct to record which two Avatar NFT connected.  One Avatar NFT can connect to many
+    other Avatar NFT.  
+
 
 ## requirement 
-  1. users buy an Avatar NFT need to pay 2k LUCA, one half of that LUCA will be destroyed, other half as reword return to the NFT holder
-  2. link between two Avatar NFT, once link connected never disconnect
-  3. link will not affect the NFT normal function(don't have to deposit)
+
+1. users buy an Avatar NFT need to pay 2k LUCA, one half of that LUCA will be destroyed, other half as reword return to the NFT holder
+2. link between two Avatar NFT, once link connected never disconnect
+3. link will not affect the NFT normal function(don't have to deposit)
 
 ## contract 
 
-#### Avatar.sol 
+#### 1. Avatar.sol 
 Avatar NFT contract, base from [ERC721](https://docs.openzeppelin.com/contracts/4.x/api/token/erc721#IERC721) and add below functions.
 
-`mint(address to, uint256 n)` Create NFT : `to` is NFT receiver, `n` is NFT amount, user before call this function to create NFT need to approve enough LUCA.
+1. `mint(address to, uint256 n)` **Create NFT** : `to` is NFT receiver, `n` is NFT amount, user before call this function to create NFT need to approve enough LUCA.
 
-`setPrice(uint256 _price)` Set Price : `_price` is number of Avatar NFT price
+2. `setPrice(uint256 _price)` **Set Price** : `_price` is number of Avatar NFT price
 
-`setLimit(uint256 _limit)` Set Limit :  `_limit` is limit of Avatar NFT 
+3. `setLimit(uint256 _limit)` **Set Limit** :  `_limit` is limit of Avatar NFT 
 
-`setRevealed(bool _state)` Set Revealed : `_state` stata of revealed tokenURI, false use the common URI, true use privet URI
+4. `setRevealed(bool _state)` **Set Revealed** : `_state` stata of revealed tokenURI, false use the common URI, true use unique URI
 
-`setBaseURI(string memory uri)` Set BaseURI
+5. `setBaseURI(string memory uri)` **Set BaseURI**
 
-`setHiddenUri(string memory uri)` Set HiddenUri : common URI
+6. `setHiddenUri(string memory uri)` **Set HiddenUri** : common URI
 
-`setUriSuffix(string memory fix)` Set UriSuffix
+7. `setUriSuffix(string memory fix)` **Set UriSuffix**
 
-`withdraw(address token, address to)` Withdraw token from contract : `token` is token address, `to` is receiver address
+8. `withdraw(address token, address to)` **Withdraw** token from contract : `token` is token address, `to` is receiver address
 
 
-#### AvatarLink.sol
+#### 2. AvatarLink.sol
 Avatar Link contract, proved link invite, connect functions and some data query functions.
 
 ##### core data struct 
@@ -62,10 +65,10 @@ Avatar Link contract, proved link invite, connect functions and some data query 
 
 ##### write functions
 
-`invite(uint256 idA, address userB)`  Invite others : `idA` is invite's NFT tokenId, `userB` is invitee's address.
+1. `invite(uint256 idA, address userB)`  Invite others : `idA` is invite's NFT tokenId, `userB` is invitee's address.
 when user call this function,the contract will record a pair of data `linkId` , `LinkMSG` and save to above data struct(`link`,`pivt`,`rivt`). 
 
-`connect(uint256 linkId, uint256 idB)` Connect(finish link): `linkId` each linkId corresponds to a unique LinkMSG, 
+2. `connect(uint256 linkId, uint256 idB)` Connect(finish link): `linkId` each linkId corresponds to a unique LinkMSG, 
 `idB` is invitee's Avatar NFT tokenId, if this link's invitee don't holder Avatar NFT, will not finish connect.
 
 ##### read functions 
