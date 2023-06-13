@@ -1,10 +1,11 @@
-# atm-avatar-contract
+# **atm-avatar-contract**
 
-## introduction 
+## introduction
 
-    Avatar Link is a new Link, different with ATM Link. the link is not a contract, and NFT don't have to deposit on
-    any contract. the link just a data struct to record which two Avatar NFT connected.  One Avatar NFT can connect to many
-    other Avatar NFT.  
+Avatar Link is a new Link, different with ATM Link. the link is not a contract, and NFT don't have to deposit on
+any contract. the link just a data struct to record which two Avatar NFT connected.  One Avatar NFT can connect to many
+other Avatar NFT.  
+
 
 
 ## requirement 
@@ -54,7 +55,7 @@ Avatar Link contract, proved link invite, connect functions and some data query 
          //--- link created (invite but not connect)
         uint256 public supply;                                          //amount of links
         mapping(uint256 => LinkMSG) public link;                        //link: id => linkMSG
-        mapping(uint256 => uint256[]) public pivt;                      //posted link invite: token ID => linkID set 
+        mapping(uint256 => uint256[]) public pivt;                      //publish link invite: token ID => linkID set 
         mapping(address => uint256[]) public rivt;                      //receve link invite: address ID => linkID set 
     
         //--- link connected 
@@ -65,10 +66,17 @@ Avatar Link contract, proved link invite, connect functions and some data query 
 
 ##### write functions
 
-1. `invite(uint256 idA, address userB)`  Invite others : `idA` is invite's NFT tokenId, `userB` is invitee's address.
+1. `invite(uint256 idA, address userB)`  **Invite others** : `idA` is invite's NFT tokenId, `userB` is invitee's address.
 when user call this function,the contract will record a pair of data `linkId` , `LinkMSG` and save to above data struct(`link`,`pivt`,`rivt`). 
 
-2. `connect(uint256 linkId, uint256 idB)` Connect(finish link): `linkId` each linkId corresponds to a unique LinkMSG, 
+2. `connect(uint256 linkId, uint256 idB)` **Connect**(finish link): `linkId` each linkId corresponds to a unique LinkMSG, 
 `idB` is invitee's Avatar NFT tokenId, if this link's invitee don't holder Avatar NFT, will not finish connect.
 
 ##### read functions 
+1. `isConnect(uint256 idA, uint256 idB) public view returns(bool)` **isConnect** : check two Avatar NFT tokenId if connected.
+2. `getLinkMSG(uint256 idA, uint256 idB) public view returns(uint256 _linkId, address _userA, address _userB, uint256 _idA, uint256 _idB, uint256 _ivt_tamp, uint256 _cnt_tamp, bool _connect)` **getLinkMSG** : get connect information by two Avatar NFT tokenId
+3. `link(uint256 linkId) public view returns(uint256 _linkId, address _userA, address _userB, uint256 _idA, uint256 _idB, uint256 _ivt_tamp, uint256 _cnt_tamp, bool _connect)` **link** : get connect information by linkId
+4. `supply() public view returns(uint256 amount)` **supply** : total amount of links
+5. `pivt(uint256 tokenId) public view returns(uint256[] linkIds)` **pivt** : get all invited link's linkId set (publish invite)
+6. `rivt(address user) public view returns(uint256[] linkIds)` **rivt** : get all was invited link's linkId set (receive invite)
+7. `linkSet(uint256 tokenId) public view returns(uint256[] linkIds)` **linkSet** : get all connect tokenId set
