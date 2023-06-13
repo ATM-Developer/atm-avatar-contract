@@ -80,3 +80,8 @@ when user call this function,the contract will record a pair of data `linkId` , 
 5. `pivt(uint256 tokenId) public view returns(uint256[] linkIds)` **pivt** : get all invited link's linkId set (publish invite)
 6. `rivt(address user) public view returns(uint256[] linkIds)` **rivt** : get all was invited link's linkId set (receive invite)
 7. `linkSet(uint256 tokenId) public view returns(uint256[] linkIds)` **linkSet** : get all connect tokenId set
+8. `getLinkAmount(uint256 tokenId) public view returns(uint256)` **getLinkAmount** : get connected link's amount
+
+##### event
+1. `Invite(uint256 indexed linkId, address userA, address userB, uint256 idA);`
+2. `Connect(uint256 indexed linkId, address userA, address userB, uint256 idA, uint256 idB);`
