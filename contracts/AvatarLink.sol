@@ -19,8 +19,8 @@ contract AvatarLink {
     //--- link created
     uint256 public supply;                                          //amount of links
     mapping(uint256 => LinkMSG) public link;                        //link: id => linkMSG
-    mapping(uint256 => uint256[]) public pivt;                      //posted link invite: token ID => linkID set 
-    mapping(address => uint256[]) public rivt;                      //receve link invite: address ID => linkID set 
+    mapping(uint256 => uint256[]) public pivt;                      //published link invite: token ID => linkID set
+    mapping(address => uint256[]) public rivt;                      //received link invite: address ID => linkID set
 
     //--- link connected 
     mapping(uint256 => mapping(uint256 => uint256)) private linkMap;//Avatar linkMap: min TokenID => max TokenID => linkID
@@ -34,17 +34,6 @@ contract AvatarLink {
         (uint256 a, uint256 b) = idA < idB ? (idA, idB) : (idB, idA);
         uint256 id = linkMap[a][b];
         return link[id].connect;
-    }
-
-    function isInvite(uint256 idA, uint256 idB) public view returns(bool){
-        require(idA > 0 && idB > 0 && idA != idB, "AvatarLink: not-allow-id");
-        (uint256 a, uint256 b) = idA < idB ? (idA, idB) : (idB, idA);
-        uint256 id = linkMap[a][b];
-        if(id > 0){
-            return true;
-        }else{
-            return false;
-        }
     }
 
     function getLinkMSG(uint256 idA, uint256 idB) public view returns(uint256 _linkId, address _userA, address _userB, uint256 _idA, uint256 _idB, uint256 _ivt_tamp, uint256 _cnt_tamp, bool _connect){
