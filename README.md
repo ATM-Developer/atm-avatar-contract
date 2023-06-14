@@ -85,3 +85,44 @@ when user call this function,the contract will record a pair of data `linkId` , 
 ##### event
 1. `Invite(uint256 indexed linkId, address userA, address userB, uint256 idA);`
 2. `Connect(uint256 indexed linkId, address userA, address userB, uint256 idA, uint256 idB);`
+
+## docking & debug
+
+#### blockchain environment
+
+```azure
+   Network: BSC-Test
+   LUCA:  0xD7a1cA21D73ff98Cc64A81153eD8eF89C2a1EfEF
+   Avatar: 0xEec36386E8647189b5402239F1377d26eF6E2e14
+   AvatarLink: 0xDd33B6ca4A73F60E14A11af4D2477c69A116d188
+        
+```
+
+#### workflow
+1. Make sure you have enough TBNB and LUCA on your account(testnet NFT price 10LUCA)
+2. Authorize to Avatar contract 
+```azure
+   //call LUCA's contratc "approve" function
+   function approve(address spender, uint256 amount) external returns (bool);
+```
+
+3. Create NFT
+```azure
+    //call Avatar's "mint" function
+    function mint(address to, uint256 n);
+```
+
+4. invite others to connect 
+```azure
+   //call  AvatarLink's "invite" function
+   function invite(uint256 idA, address userB);
+```
+
+5. agree connect 
+```azure
+   //call  AvatarLink's "connect" function
+   function connect(uint256 linkId, uint256 idB);
+```
+
+## third-party interfaces
+1. [bscscan-api](https://docs.bscscan.com/)(Including asset statistics and NFT holding list)
