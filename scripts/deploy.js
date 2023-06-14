@@ -7,22 +7,21 @@
 const hre = require("hardhat");
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+  //const luca = 0x51E6Ac1533032E72e92094867fD5921e3ea1bfa0; //mian net
+  const luca = "0xD7a1cA21D73ff98Cc64A81153eD8eF89C2a1EfEF"; //test net
+  const price = 10000;
+  const limit = 2000;
 
-  const lockedAmount = hre.ethers.parseEther("0.001");
+  console.log("\n\n\n########### deploy contracts ################\n\n\n");
+  const avatar = await ethers.getContractFactory("Avatar");
+  const Avatar = await avatar.deploy("Avatar NFT Test","AVT",luca, price, limit);
+  console.log(`Avatar NFT Contract deployed, address :${Avatar.address}`);
 
-  const lock = await hre.ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
-  });
+  const avatarLinkPorxy = await ethers.getContractFactory("AvatarLinkProxy");
+  const AvatarLinkPorxy = await avatarLinkPorxy.deploy(Avatar.address);
+  console.log(`AvatarLinkPorxy Contract deployed, address :${AvatarLinkPorxy.address}, logicAddress : ${AvatarLinkPorxy.logic()}`);
 
-  await lock.waitForDeployment();
 
-  console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
-  );
 }
 
 // We recommend this pattern to be able to use async/await everywhere

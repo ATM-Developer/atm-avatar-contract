@@ -7,6 +7,10 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+interface ILUCA is IERC20{
+    function burn(uint256 amount) external;
+}
+
 contract Avatar is Ownable, ERC721{
     using Math for uint256;
     using Strings for uint256;
@@ -38,10 +42,8 @@ contract Avatar is Ownable, ERC721{
         require(add(supply, n) <= limit, "Avatar: out-of-limit");
 
         uint256 amt = mul(n, price);
-
-        IERC20(luca).transferFrom(msg.sender, address(this), amt);
-
-        IERC20(luca).transfer(address(0), amt / 2);
+        ILUCA(luca).transferFrom(msg.sender, address(this), amt);
+        ILUCA(luca).burn(amt / 2);
 
         for (uint256 i=0; i< n; i++){
             supply++;

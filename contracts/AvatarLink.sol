@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import  "./utils/init.sol";
 
-contract AvatarLink {
+contract AvatarLink is Initialize{
     struct LinkMSG{
         uint256 linkId;
         address userA;
@@ -15,7 +17,6 @@ contract AvatarLink {
         bool connect;     //is connect
     }
     address public avatar;
-
     //--- link created
     uint256 public supply;                                          //amount of links
     mapping(uint256 => LinkMSG) public link;                        //link: id => linkMSG
@@ -28,6 +29,8 @@ contract AvatarLink {
 
     event Invite(uint256 indexed linkId, address userA, address userB, uint256 idA);
     event Connect(uint256 indexed linkId, address userA, address userB, uint256 idA, uint256 idB);
+
+    function initialize(address _avatar) init public {avatar = _avatar;}
 
     function isConnect(uint256 idA, uint256 idB) public view returns(bool){
         require(idA > 0 && idB > 0 && idA != idB, "AvatarLink: not-allow-id");
@@ -82,7 +85,6 @@ contract AvatarLink {
 
     //users can't connect with the same token ID if this connect exist.
     function connect(uint256 linkId, uint256 idB) public {
-
         //check link
         LinkMSG memory l = link[linkId];
         require(l.linkId > 0, "AvatarLink: link-not-exist");
@@ -106,3 +108,5 @@ contract AvatarLink {
         emit Connect(l.linkId, l.userA, l.userB, l.idA, l.idB);
     }
 }
+
+
