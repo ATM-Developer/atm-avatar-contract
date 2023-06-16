@@ -32,7 +32,7 @@ describe("Lock", function () {
       expect(await lock.unlockTime()).to.equal(unlockTime);
     });
 
-    it("Should set the right owner", async function () {
+    it("Should set the right owner.sol", async function () {
       const { lock, owner } = await loadFixture(deployOneYearLockFixture);
 
       expect(await lock.owner()).to.equal(owner.address);
@@ -78,11 +78,11 @@ describe("Lock", function () {
 
         // We use lock.connect() to send a transaction from another account
         await expect(lock.connect(otherAccount).withdraw()).to.be.revertedWith(
-          "You aren't the owner"
+          "You aren't the owner.sol"
         );
       });
 
-      it("Shouldn't fail if the unlockTime has arrived and the owner calls it", async function () {
+      it("Shouldn't fail if the unlockTime has arrived and the owner.sol calls it", async function () {
         const { lock, unlockTime } = await loadFixture(
           deployOneYearLockFixture
         );
@@ -109,7 +109,7 @@ describe("Lock", function () {
     });
 
     describe("Transfers", function () {
-      it("Should transfer the funds to the owner", async function () {
+      it("Should transfer the funds to the owner.sol", async function () {
         const { lock, unlockTime, lockedAmount, owner } = await loadFixture(
           deployOneYearLockFixture
         );

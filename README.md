@@ -19,21 +19,16 @@ other Avatar NFT.
 #### 1. Avatar.sol 
 Avatar NFT contract, base from [ERC721](https://docs.openzeppelin.com/contracts/4.x/api/token/erc721#IERC721) and add below functions.
 
-1. `mint(address to, uint256 n)` **Create NFT** : `to` is NFT receiver, `n` is NFT amount, user before call this function to create NFT need to approve enough LUCA.
 
-2. `setPrice(uint256 _price)` **Set Price** : `_price` is number of Avatar NFT price
+1. `setRevealed(bool _state)` **Set Revealed** : `_state` stata of revealed tokenURI, false use the common URI, true use unique URI
 
-3. `setLimit(uint256 _limit)` **Set Limit** :  `_limit` is limit of Avatar NFT 
+2. `setBaseURI(string memory uri)` **Set BaseURI**
 
-4. `setRevealed(bool _state)` **Set Revealed** : `_state` stata of revealed tokenURI, false use the common URI, true use unique URI
+3. `setHiddenUri(string memory uri)` **Set HiddenUri** : common URI
 
-5. `setBaseURI(string memory uri)` **Set BaseURI**
+4. `setUriSuffix(string memory fix)` **Set UriSuffix**
 
-6. `setHiddenUri(string memory uri)` **Set HiddenUri** : common URI
-
-7. `setUriSuffix(string memory fix)` **Set UriSuffix**
-
-8. `withdraw(address token, address to)` **Withdraw** token from contract : `token` is token address, `to` is receiver address
+5. `setMinter(string memory fix)` **Set Minter** : only minter can mint NFT, after first NFT be created the Minter need set to AvatarLink contract
 
 
 #### 2. AvatarLink.sol
@@ -69,8 +64,10 @@ Avatar Link contract, proved link invite, connect functions and some data query 
 1. `invite(uint256 idA, address userB)`  **Invite others** : `idA` is invite's NFT tokenId, `userB` is invitee's address.
 when user call this function,the contract will record a pair of data `linkId` , `LinkMSG` and save to above data struct(`link`,`pivt`,`rivt`). 
 
-2. `connect(uint256 linkId, uint256 idB)` **Connect**(finish link): `linkId` each linkId corresponds to a unique LinkMSG, 
-`idB` is invitee's Avatar NFT tokenId, if this link's invitee don't holder Avatar NFT, will not finish connect.
+2. `connect(uint256 linkId)` **Connect**(finish link): `linkId` each linkId corresponds to a unique LinkMSG, before call this function need approve luca for AvatarLink contract.
+this function will receive user's luca and mint an Avatar NFT for user, then finish connect.
+
+4. `withdraw(address token, address to)` **Withdraw** token from contract : `token` is token address, `to` is receiver address
 
 ##### read functions 
 1. `isConnect(uint256 idA, uint256 idB) public view returns(bool)` **isConnect** : check two Avatar NFT tokenId if connected.
@@ -82,9 +79,10 @@ when user call this function,the contract will record a pair of data `linkId` , 
 7. `linkSet(uint256 tokenId) public view returns(uint256[] linkIds)` **linkSet** : get all connect tokenId set
 8. `getLinkAmount(uint256 tokenId) public view returns(uint256)` **getLinkAmount** : get connected link's amount
 
-##### event
+##### events
 1. `Invite(uint256 indexed linkId, address userA, address userB, uint256 idA);`
 2. `Connect(uint256 indexed linkId, address userA, address userB, uint256 idA, uint256 idB);`
+3. `Withdraw(address indexed token, address to, uint256 amt);`
 
 ## docking & debug
 
@@ -93,33 +91,33 @@ when user call this function,the contract will record a pair of data `linkId` , 
 ```azure
    Network: BSC-Test
    LUCA:  0xD7a1cA21D73ff98Cc64A81153eD8eF89C2a1EfEF
-   Avatar: 0xEec36386E8647189b5402239F1377d26eF6E2e14
-   AvatarLink: 0xDd33B6ca4A73F60E14A11af4D2477c69A116d188
+   Avatar NFT: 0x90380308827ab3685B776588c7eB880014533506
+   AvatarLink: 0xB62c44Ea68c6c493cE159c37330899AC1FeF248d
         
 ```
 
 #### workflow
-1. Make sure you have enough TBNB and LUCA on your account(testnet NFT price 10LUCA)
-2. Authorize to Avatar contract 
-```azure
-   //call LUCA's contratc "approve" function
-   function approve(address spender, uint256 amount) external returns (bool);
-```
 
-3. Create NFT
-```azure
-    //call Avatar's "mint" function
-    function mint(address to, uint256 n);
-```
+##### invite-workflow
+1. Make sure you have enough TBNB and Avatar NFT
 
-4. invite others to connect 
-```azure
-   //call  AvatarLink's "invite" function
+2. call AvatarLink contract "invite" function
+```solidity
    function invite(uint256 idA, address userB);
 ```
 
-5. agree connect 
-```azure
+
+##### connect-workflow
+1. Make sure you have enough TBNB and LUCA on your account(testnet NFT price 10LUCA)
+
+2. Authorize to AvatarLink contract 
+```solidity
+   //call LUCA's contratc "approve" function 
+   function approve(address spender, uint256 amount) external returns (bool);
+```
+
+3. agree connect 
+```solidity
    //call  AvatarLink's "connect" function
    function connect(uint256 linkId, uint256 idB);
 ```

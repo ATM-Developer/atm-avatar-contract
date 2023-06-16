@@ -2,8 +2,14 @@
 
 pragma solidity ^0.8.1;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import  "./utils/init.sol";
+
+
+interface IAVATAR {
+    function mint(address to) external returns(uint256);
+}
 
 contract AvatarLink is Initialize{
     struct LinkMSG{
@@ -16,12 +22,19 @@ contract AvatarLink is Initialize{
         uint256 cnt_tamp; //connect time
         bool connect;     //is connect
     }
-    address public avatar;
+
+    //--- Avatar NFT config
+    address public luca;
+    address public avatar;      //Avatar NFT contarct
+    address public avatarCFO;   //Avatar NFT financial manage
+    uint256 public avatarLimit; //Avatar NFT supply Limit
+    uint256 public avatarPrice; //Avatar NFT price
+
     //--- link created
-    uint256 public supply;                                          //amount of links
-    mapping(uint256 => LinkMSG) public link;                        //link: id => linkMSG
-    mapping(uint256 => uint256[]) public pivt;                      //published link invite: token ID => linkID set
-    mapping(address => uint256[]) public rivt;                      //received link invite: address ID => linkID set
+    uint256 public supply;                      //amount of links
+    mapping(uint256 => LinkMSG) public link;    //link: id => linkMSG
+    mapping(uint256 => uint256[]) public pivt;  //published link invite: token ID => linkID set
+    mapping(address => uint256[]) public rivt;  //received link invite: address ID => linkID set
 
     //--- link connected 
     mapping(uint256 => mapping(uint256 => uint256)) private linkMap;//Avatar linkMap: min TokenID => max TokenID => linkID
@@ -29,8 +42,15 @@ contract AvatarLink is Initialize{
 
     event Invite(uint256 indexed linkId, address userA, address userB, uint256 idA);
     event Connect(uint256 indexed linkId, address userA, address userB, uint256 idA, uint256 idB);
+    event Withdraw(address indexed token, address to, uint256 amt);
 
-    function initialize(address _avatar) init public {avatar = _avatar;}
+    function initialize(address _luca, address _avatar, address _cfo, uint256 _limit, uint256 _price) init public {
+        luca = _luca;
+        avatar = _avatar;
+        avatarCFO = _cfo;
+        avatarLimit = _limit;
+        avatarPrice = _price; 
+    }
 
     function isConnect(uint256 idA, uint256 idB) public view returns(bool){
         require(idA > 0 && idB > 0 && idA != idB, "AvatarLink: not-allow-id");
@@ -59,6 +79,7 @@ contract AvatarLink is Initialize{
         return linkSet[tokenId].length;
     }
 
+
     //users can use the same Avatar NFT to invite the same invitee(userB), but the invitee can't use the same NFT to connect. 
     function invite(uint256 idA, address userB) public {
         require(msg.sender == IERC721(avatar).ownerOf(idA), "AvatarLink: not-NFT-owner");
@@ -84,13 +105,17 @@ contract AvatarLink is Initialize{
     }
 
     //users can't connect with the same token ID if this connect exist.
-    function connect(uint256 linkId, uint256 idB) public {
-        //check link
+    function connect(uint256 linkId) public {
+         //check link
         LinkMSG memory l = link[linkId];
         require(l.linkId > 0, "AvatarLink: link-not-exist");
         require(l.userB == msg.sender, "AvatarLink: not-invitee");
-        require(IERC721(avatar).ownerOf(idB) == msg.sender, "AvatarLink: not-NFT-owner");
-        require(!isConnect(l.idA, idB), "AvatarLink: connect-exist");
+
+        //receive LUCA
+        require(IERC20(luca).transferFrom(msg.sender, address(this), avatarPrice), "AvatarLink: receive-luca-fail");
+
+        //create Avatar NFT
+        uint256 idB = IAVATAR(avatar).mint(msg.sender);
 
         //update linkMSG
         l.idB = idB;
@@ -106,6 +131,14 @@ contract AvatarLink is Initialize{
         linkSet[b].push(a);
 
         emit Connect(l.linkId, l.userA, l.userB, l.idA, l.idB);
+    }
+
+    function withdraw(address token, address to) public {
+        require(msg.sender == avatarCFO, "AvatarLink: only-avatar-CFO");
+        uint256 amt = IERC20(token).balanceOf(address(this));
+        IERC20(token).transfer(to, amt);
+
+        emit Withdraw(token, to, amt);
     }
 }
 
