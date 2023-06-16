@@ -101,7 +101,7 @@ this function will receive user's luca and mint an Avatar NFT for user, then fin
 ##### invite-workflow
 1. Make sure you have enough TBNB and Avatar NFT
 
-2. call AvatarLink contract "invite" function
+2. Call AvatarLink contract "invite" function
 ```solidity
    function invite(uint256 idA, address userB);
 ```
@@ -116,7 +116,7 @@ this function will receive user's luca and mint an Avatar NFT for user, then fin
    function approve(address spender, uint256 amount) external returns (bool);
 ```
 
-3. agree connect 
+3. Agree connect 
 ```solidity
    //call  AvatarLink's "connect" function
    function connect(uint256 linkId, uint256 idB);
