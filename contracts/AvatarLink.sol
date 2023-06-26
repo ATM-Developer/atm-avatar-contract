@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import  "./utils/init.sol";
+import  "./utils/ECDSA.sol";
 
 
 interface IAVATAR {
@@ -16,38 +16,34 @@ contract AvatarLink is Initialize{
         uint256 linkId;
         address userA;
         address userB;
-        uint256 idA;      //userA token id
-        uint256 idB;      //userB token id
-        uint256 ivt_tamp; //invite time
-        uint256 cnt_tamp; //connect time
-        bool connect;     //is connect
+        uint256 idA;
+        uint256 idB;
+        uint256 tamp;
     }
 
     //--- Avatar NFT config
     address public luca;
-    address public avatar;      //Avatar NFT contarct
+    address public avatar;      //Avatar NFT contract
     address public avatarCFO;   //Avatar NFT financial manage
+    address public avatarSign;  //Avatar NFT signer
     uint256 public avatarLimit; //Avatar NFT supply Limit
     uint256 public avatarPrice; //Avatar NFT price
 
-    //--- link created
-    uint256 public supply;                      //amount of links
-    mapping(uint256 => LinkMSG) public link;    //link: id => linkMSG
-    mapping(uint256 => uint256[]) public pivt;  //published link invite: token ID => linkID set
-    mapping(address => uint256[]) public rivt;  //received link invite: address ID => linkID set
-
-    //--- link connected 
+    //--- link
+    uint256 public supply;                                          //amount of links
+    mapping(uint256 => LinkMSG) public link;                        //link: id => linkMSG
+    mapping(uint256 => uint256) public signMap;                     //signMap: signId => linkId
     mapping(uint256 => mapping(uint256 => uint256)) private linkMap;//Avatar linkMap: min TokenID => max TokenID => linkID
     mapping(uint256 => uint256[]) public linkSet;                   //Avatar linkSet: TokenID => tokenID set
 
-    event Invite(uint256 indexed linkId, address userA, address userB, uint256 idA);
     event Connect(uint256 indexed linkId, address userA, address userB, uint256 idA, uint256 idB);
     event Withdraw(address indexed token, address to, uint256 amt);
 
-    function initialize(address _luca, address _avatar, address _cfo, uint256 _limit, uint256 _price) init public {
+    function initialize(address _luca, address _avatar, address _cfo, address _sign, uint256 _limit, uint256 _price) init public {
         luca = _luca;
         avatar = _avatar;
         avatarCFO = _cfo;
+        avatarSign = _sign;
         avatarLimit = _limit;
         avatarPrice = _price; 
     }
@@ -56,22 +52,22 @@ contract AvatarLink is Initialize{
         require(idA > 0 && idB > 0 && idA != idB, "AvatarLink: not-allow-id");
         (uint256 a, uint256 b) = idA < idB ? (idA, idB) : (idB, idA);
         uint256 id = linkMap[a][b];
-        return link[id].connect;
+        if (id > 0) return true;
+        return false;
     }
 
-    function getLinkMSG(uint256 idA, uint256 idB) public view returns(uint256 _linkId, address _userA, address _userB, uint256 _idA, uint256 _idB, uint256 _ivt_tamp, uint256 _cnt_tamp, bool _connect){
+    function getLinkMSG(uint256 idA, uint256 idB) public view returns(uint256 _linkId, address _userA, address _userB, uint256 _idA, uint256 _idB, uint256 _tamp){
         require(idA > 0 && idB > 0 && idA != idB, "AvatarLink: not-allow-id");
         (uint256 a, uint256 b) = idA < idB ? (idA, idB) : (idB, idA);
         uint256 id = linkMap[a][b];
+        LinkMSG memory l = link[id];
         if(id > 0){
-            _linkId= link[id].linkId;
-            _userA = link[id].userA;
-            _userB = link[id].userB;
-            _idA   = link[id].idA;
-            _idB   = link[id].idB;
-            _ivt_tamp = link[id].ivt_tamp;
-            _cnt_tamp = link[id].cnt_tamp;
-            _connect  = link[id].connect;
+            _linkId= l.linkId;
+            _userA = l.userA;
+            _userB = l.userB;
+            _idA   = l.idA;
+            _idB   = l.idB;
+            _tamp  = l.tamp;
         }
     }
 
@@ -79,53 +75,40 @@ contract AvatarLink is Initialize{
         return linkSet[tokenId].length;
     }
 
-
-    //users can use the same Avatar NFT to invite the same invitee(userB), but the invitee can't use the same NFT to connect. 
-    function invite(uint256 idA, address userB) public {
-        require(msg.sender == IERC721(avatar).ownerOf(idA), "AvatarLink: not-NFT-owner");
-        require(userB != msg.sender && userB != address(0), "AvatarLink: not-allow-address");
-
-        supply++;
-        LinkMSG memory l = LinkMSG(
-            supply,            //linkId
-            msg.sender,        //userA
-            userB,             //userB
-            idA,               //idA
-            0,                 //idB
-            block.timestamp,   //ivt_tamp
-            0,                 //cnt_tamp
-            false              //connect
-        );
-
-        link[supply] = l;           //add to link
-        pivt[idA].push(supply);     //add linkID to post ivt set
-        rivt[userB].push(supply);   //add linkID to recive ivt set
-
-        emit Invite(l.linkId, l.userA, l.userB, l.idA);
+    function verifySign(uint256 signId, address inviter, uint256 tokenId, address invitee, bytes memory signature) public view returns(bool){
+        bytes32 message = ECDSA.toEthSignedMessageHash(keccak256(abi.encodePacked(signId, inviter, tokenId, invitee)));
+        if (ECDSA.recoverSigner(message, signature) == avatarSign) return true;
+        return false;
     }
 
-    //users can't connect with the same token ID if this connect exist.
-    function connect(uint256 linkId) public {
-         //check link
-        LinkMSG memory l = link[linkId];
-        require(l.linkId > 0, "AvatarLink: link-not-exist");
-        require(l.userB == msg.sender, "AvatarLink: not-invitee");
+    function connect(uint256 signId, address inviter, uint256 tokenId, bytes memory signature) external {
+        require(signMap[signId] == 0, "AvatarLink: used-signature");
+        require(inviter != msg.sender, "AvatarLink: invalid-invitation");
+        require(IERC721(avatar).ownerOf(tokenId) == inviter, "AvatarLink: inviter-not-holder");
+        require(verifySign(signId, inviter, tokenId, msg.sender, signature), "AvatarLink: invalid-signature");
+        require(IERC20(luca).allowance(msg.sender, address(this)) >= avatarPrice, "AvatarLink: under-approve");
 
         //receive LUCA
-        require(IERC20(luca).transferFrom(msg.sender, address(this), avatarPrice), "AvatarLink: receive-luca-fail");
-
+        IERC20(luca).transferFrom(msg.sender, address(this), avatarPrice);
         //create Avatar NFT
         uint256 idB = IAVATAR(avatar).mint(msg.sender);
-
-        //update linkMSG
+        //record link information
+        supply++;
+        LinkMSG memory l;
+        //load linkMSG
+        l.linkId = supply;
+        l.userA = inviter;
+        l.userB = msg.sender;
+        l.idA = tokenId;
         l.idB = idB;
-        l.cnt_tamp = block.timestamp;
-        l.connect = true;
-        link[linkId] = l;
+        l.tamp = block.timestamp;
+        link[supply] = l;
 
-        //update linkMap and linkSet
+        //update signMap, linkMap and linkSet
+        signMap[signId] = supply;
+
         (uint256 a, uint256 b) = l.idA < l.idB ? (l.idA, l.idB) : (l.idB, l.idA);
-        linkMap[a][b] = linkId;
+        linkMap[a][b] = supply;
 
         linkSet[a].push(b);
         linkSet[b].push(a);
