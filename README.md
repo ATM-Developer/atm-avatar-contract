@@ -105,7 +105,7 @@ create connect, before call this function need approve luca for AvatarLink contr
    //call  AvatarLink's "connect" function
    function connect(uint256 signId, address inviter, uint256 tokenId, bytes memory signature);
 ```
-~~~~
+
 ## third-party interfaces
 1. [bscscan-api](https://docs.bscscan.com/)(Including asset statistics and NFT holding list)
 2. [web3.js-doc](https://web3js.readthedocs.io/)
