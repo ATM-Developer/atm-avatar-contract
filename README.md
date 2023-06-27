@@ -66,6 +66,7 @@ create connect, before call this function need approve luca for AvatarLink contr
 4. **supply** `supply() public view returns(uint256 amount)` : total amount of links
 5. **linkSet** `linkSet(uint256 tokenId) public view returns(uint256[] linkIds)`: get all connect tokenId set
 6. **getLinkAmount** `getLinkAmount(uint256 tokenId) public view returns(uint256)`: get connected link's amount
+7. **getPrice** `function getPrice(uint256 vaule) public view returns(uint256)`: get Avatar NFT price(LUCA), `vaule` is amount of USD(BUSD)
 
 ##### events
 
@@ -78,9 +79,13 @@ create connect, before call this function need approve luca for AvatarLink contr
 
 ```js
    Network: BSC-Test
-   LUCA:  0xD7a1cA21D73ff98Cc64A81153eD8eF89C2a1EfEF
-   Avatar_NFT: 0x90380308827ab3685B776588c7eB880014533506
-   AvatarLink: 0x5F1D0dCcF9E5b76B712D1A05dBbF2587477dd4BE
+   PancakeSwap:     https://pcs.nhancv.com/#/swap    
+   LUCA:            0xD7a1cA21D73ff98Cc64A81153eD8eF89C2a1EfEF
+   BUSD:            0xe0dfffc2e01a7f051069649ad4eb3f518430b6a4
+   PancakeRouter:   0xCc7aDc94F3D80127849D2b41b6439b7CF1eB4Ae0
+   PancakePair:     0x36b20fDB728771484bd7F9E5b124A19272c1FDC0
+   Avatar_NFT:      0x90380308827ab3685B776588c7eB880014533506
+   AvatarLink:      0x982f67Fde928CC1Bb630e84e7b75fE03032B6767
 ```
 
 #### workflow

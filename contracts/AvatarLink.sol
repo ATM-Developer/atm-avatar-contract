@@ -6,6 +6,10 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import  "./utils/init.sol";
 import  "./utils/ECDSA.sol";
 
+interface IuniSwapRouterV2{
+    function getAmountsIn(uint256 amountOut, address[] memory path) external view returns(uint256[] memory amounts);
+    //function getAmountsOut(uint256 amountIn, address[] calldata path) external returns(uint256[] calldata amounts);
+}
 
 interface IAVATAR {
     function mint(address to) external returns(uint256);
@@ -21,31 +25,38 @@ contract AvatarLink is Initialize{
         uint256 tamp;
     }
 
-    //--- Avatar NFT config
-    address public luca;
-    address public avatar;      //Avatar NFT contract
-    address public avatarCFO;   //Avatar NFT financial manage
-    address public avatarSign;  //Avatar NFT signer
-    uint256 public avatarLimit; //Avatar NFT supply Limit
-    uint256 public avatarPrice; //Avatar NFT price
-
-    //--- link
+    //--- Avatar link information
     uint256 public supply;                                          //amount of links
     mapping(uint256 => LinkMSG) public link;                        //link: id => linkMSG
     mapping(uint256 => uint256) public signMap;                     //signMap: signId => linkId
     mapping(uint256 => mapping(uint256 => uint256)) private linkMap;//Avatar linkMap: min TokenID => max TokenID => linkID
     mapping(uint256 => uint256[]) public linkSet;                   //Avatar linkSet: TokenID => tokenID set
 
+    //--- Avatar NFT config
+    address public luca;        //LUCA 
+    address public busd;        //BUSD  
+    address public router;      //PancakeSwap router
+    address public avatar;      //Avatar NFT contract
+    address public avatarCFO;   //Avatar NFT financial manage
+    address public avatarSign;  //Avatar NFT signer
+    uint256 public avatarLimit; //Avatar NFT supply Limit
+    uint256 public avatarValue; //Avatar NFT value(BUSD)
+    address[] public path;      //PancakeSwap path
+
     event Connect(uint256 indexed linkId, address userA, address userB, uint256 idA, uint256 idB);
     event Withdraw(address indexed token, address to, uint256 amt);
 
-    function initialize(address _luca, address _avatar, address _cfo, address _sign, uint256 _limit, uint256 _price) init public {
+    function initialize(address _luca, address _busd, address _router, address _avatar, address _cfo, address _sign, uint256 _limit, uint256 _value) init public {
         luca = _luca;
+        busd = _busd;
+        router = _router;
         avatar = _avatar;
         avatarCFO = _cfo;
         avatarSign = _sign;
         avatarLimit = _limit;
-        avatarPrice = _price; 
+        avatarValue = _value; 
+        path.push(luca);
+        path.push(busd);
     }
 
     function isConnect(uint256 idA, uint256 idB) public view returns(bool){
@@ -75,6 +86,11 @@ contract AvatarLink is Initialize{
         return linkSet[tokenId].length;
     }
 
+    function getPrice(uint256 vaule) public view returns(uint256) { 
+         uint256[] memory amounts = IuniSwapRouterV2(router).getAmountsIn(vaule,  path);
+         return amounts[0];
+    }
+
     function verifySign(uint256 signId, address inviter, uint256 tokenId, address invitee, bytes memory signature) public view returns(bool){
         bytes32 message = ECDSA.toEthSignedMessageHash(keccak256(abi.encodePacked(signId, inviter, tokenId, invitee)));
         if (ECDSA.recoverSigner(message, signature) == avatarSign) return true;
@@ -86,6 +102,8 @@ contract AvatarLink is Initialize{
         require(inviter != msg.sender, "AvatarLink: invalid-invitation");
         require(IERC721(avatar).ownerOf(tokenId) == inviter, "AvatarLink: inviter-not-holder");
         require(verifySign(signId, inviter, tokenId, msg.sender, signature), "AvatarLink: invalid-signature");
+        
+        uint256 avatarPrice = getPrice(avatarValue);
         require(IERC20(luca).allowance(msg.sender, address(this)) >= avatarPrice, "AvatarLink: under-approve");
 
         //receive LUCA
