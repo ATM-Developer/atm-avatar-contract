@@ -34,24 +34,26 @@ Avatar NFT contract, base from [ERC721](https://docs.openzeppelin.com/contracts/
 Avatar Link contract, proved link invite, connect functions and some data query functions.
 
 ##### core data struct 
-        //---- link struct
-        struct LinkMSG{
-            uint256 linkId;
-            address userA;
-            address userB;
-            uint256 idA;      //userA token id
-            uint256 idB;      //userB token id
-            uint256 tamp;     //connect time
-        }
+```solidity
+     //--- Avatar link information
+    uint256 public supply;                                          //amount of links
+    mapping(uint256 => LinkMSG) public link;                        //link: id => linkMSG
+    mapping(uint256 => uint256) public signMap;                     //signMap: signId => linkId
+    mapping(uint256 => mapping(uint256 => uint256)) private linkMap;//Avatar linkMap: min TokenID => max TokenID => linkID
+    mapping(uint256 => uint256[]) public linkSet;                   //Avatar linkSet: TokenID => tokenID set
 
-         //--- link created (invite but not connect)
-        uint256 public supply;                                          //amount of links
-        mapping(uint256 => LinkMSG) public link;                        //link: id => linkMSG
-        mapping(uint256 => uint256) public signMap;                     //signMap: signId => linkId
-        mapping(uint256 => mapping(uint256 => uint256)) private linkMap;//Avatar linkMap: min TokenID => max TokenID => linkID
-        mapping(uint256 => uint256[]) public linkSet;                   //Avatar linkSet: TokenID => tokenID set
+    //--- Avatar NFT config
+    address public luca;        //LUCA 
+    address public busd;        //BUSD  
+    address public router;      //PancakeSwap router
+    address public avatar;      //Avatar NFT contract
+    address public avatarCFO;   //Avatar NFT financial manage
+    address public avatarSign;  //Avatar NFT signer
+    uint256 public avatarLimit; //Avatar NFT supply Limit
+    uint256 public avatarValue; //Avatar NFT value(BUSD)
+    address[] public path;      //PancakeSwap path
 
-
+```
 
 ##### write functions
 1. **Connect** `connect(uint256 signId, address inviter, uint256 tokenId, bytes memory signature)`, 
