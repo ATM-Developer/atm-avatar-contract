@@ -8,7 +8,10 @@ import  "./utils/ECDSA.sol";
 
 interface IuniSwapRouterV2{
     function getAmountsIn(uint256 amountOut, address[] memory path) external view returns(uint256[] memory amounts);
-    //function getAmountsOut(uint256 amountIn, address[] calldata path) external returns(uint256[] calldata amounts);
+}
+
+interface Iluca{
+    function burn(uint256 amount) external;
 }
 
 interface IAVATAR {
@@ -99,7 +102,6 @@ contract AvatarLink is Initialize{
 
     function connect(uint256 signId, address inviter, uint256 tokenId, bytes memory signature) external {
         require(signMap[signId] == 0, "AvatarLink: used-signature");
-        require(inviter != msg.sender, "AvatarLink: invalid-invitation");
         require(IERC721(avatar).ownerOf(tokenId) == inviter, "AvatarLink: inviter-not-holder");
         require(verifySign(signId, inviter, tokenId, msg.sender, signature), "AvatarLink: invalid-signature");
         
@@ -108,6 +110,9 @@ contract AvatarLink is Initialize{
 
         //receive LUCA
         IERC20(luca).transferFrom(msg.sender, address(this), avatarPrice);
+        //burn half price of LUCA
+        Iluca(luca).burn(avatarPrice/2);
+
         //create Avatar NFT
         uint256 idB = IAVATAR(avatar).mint(msg.sender);
         //record link information

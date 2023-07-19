@@ -5,10 +5,11 @@ const privatekey = `0xc4754f5e162c9cdbeb7e35489ed59d1ac17bdc3ef44824ced51c07b214
 /// invitation information
 {
     //present signId = 2
-    signId = 1,                                                //signId: auto-increment, can't use some signId to invite others
-    inviter = `0x0dCC8b2240c7406100B9544Bd4e2a7Db5E0219A6`,    //userA: inviter
-    tokenId = 1,                                               //idA: one of connect token, the owner of this token must be userA
-    invitee = `0x5c980E6CdAE758d0C68e86064c1c06B1eA19A6a9`     //userB: invitee, this address can't be userA and zero
+    signId = 40,                                                //signId: auto-increment, can't use some signId to invite others
+    //inviter = `0x0dCC8b2240c7406100B9544Bd4e2a7Db5E0219A6`,    //userA: inviter
+    inviter = `0x5c980E6CdAE758d0C68e86064c1c06B1eA19A6a9`,
+    tokenId = 6,                                               //idA: one of connect token, the owner of this token must be userA
+    invitee = `0x0dCC8b2240c7406100B9544Bd4e2a7Db5E0219A6`     //userB: invitee, this address can't be userA and zero
 }
 
 /// encode msg
