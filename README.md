@@ -19,6 +19,7 @@ other Avatar NFT.
 #### 1. Avatar.sol 
 Avatar NFT contract, base from [ERC721](https://docs.openzeppelin.com/contracts/4.x/api/token/erc721#IERC721) and add below functions.
 
+##### reade function
 1. **Set Revealed** `setRevealed(bool _state)`: `_state` stata of revealed tokenURI, false use the common URI, true use unique URI
 
 2. **Set BaseURI** `setBaseURI(string memory uri)` 
@@ -29,6 +30,8 @@ Avatar NFT contract, base from [ERC721](https://docs.openzeppelin.com/contracts/
 
 5.  **Set Minter** `setMinter(string memory fix)`: only minter can mint NFT, after first NFT be created the Minter need set to AvatarLink contract
 
+##### event 
+1. `Transfer(from, to, tokenId)`
 
 #### 2. AvatarLink.sol
 Avatar Link contract, proved link invite, connect functions and some data query functions.
