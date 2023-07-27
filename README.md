@@ -75,7 +75,7 @@ create connect, before call this function need approve luca for AvatarLink contr
 
 ##### events
 
-1. `Connect(uint256 indexed linkId, address userA, address userB, uint256 idA, uint256 idB， uint256 rewardIn);`
+1. `Connect(uint256 indexed linkId, address userA, address userB, uint256 idA, uint256 idB，uint256 rewardIn);`: `rewardIn` is amount of Luca that transfer to reward contract
 
 
 ## docking & debug
