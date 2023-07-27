@@ -75,8 +75,8 @@ create connect, before call this function need approve luca for AvatarLink contr
 
 ##### events
 
-1. `Connect(uint256 indexed linkId, address userA, address userB, uint256 idA, uint256 idB);`
-2. `Withdraw(address indexed token, address to, uint256 amt);`
+1. `Connect(uint256 indexed linkId, address userA, address userB, uint256 idA, uint256 idB， uint256 rewardIn);`
+
 
 ## docking & debug
 

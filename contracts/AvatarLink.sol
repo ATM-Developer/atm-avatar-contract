@@ -40,21 +40,20 @@ contract AvatarLink is Initialize{
     address public busd;        //BUSD  
     address public router;      //PancakeSwap router
     address public avatar;      //Avatar NFT contract
-    address public avatarCFO;   //Avatar NFT financial manage
+    address public avatarReward;//Avatar NFT reward contract(ATM reward)
     address public avatarSign;  //Avatar NFT signer
     uint256 public avatarLimit; //Avatar NFT supply Limit
     uint256 public avatarValue; //Avatar NFT value(BUSD)
     address[] public path;      //PancakeSwap path
 
-    event Connect(uint256 indexed linkId, address userA, address userB, uint256 idA, uint256 idB);
-    event Withdraw(address indexed token, address to, uint256 amt);
+    event Connect(uint256 indexed linkId, address userA, address userB, uint256 idA, uint256 idB, uint256 rewardIn);
 
-    function initialize(address _luca, address _busd, address _router, address _avatar, address _cfo, address _sign, uint256 _limit, uint256 _value) init public {
+    function initialize(address _luca, address _busd, address _router, address _avatar, address _reward, address _sign, uint256 _limit, uint256 _value) init public {
         luca = _luca;
         busd = _busd;
         router = _router;
         avatar = _avatar;
-        avatarCFO = _cfo;
+        avatarReward = _reward;
         avatarSign = _sign;
         avatarLimit = _limit;
         avatarValue = _value; 
@@ -108,8 +107,8 @@ contract AvatarLink is Initialize{
         uint256 avatarPrice = getPrice(avatarValue);
         require(IERC20(luca).allowance(msg.sender, address(this)) >= avatarPrice, "AvatarLink: under-approve");
 
-        //receive LUCA
-        IERC20(luca).transferFrom(msg.sender, address(this), avatarPrice);
+        //send LUCA to reward contract
+        IERC20(luca).transferFrom(msg.sender, avatarReward, avatarPrice/2);
         //burn half price of LUCA
         Iluca(luca).burn(avatarPrice/2);
 
@@ -136,15 +135,7 @@ contract AvatarLink is Initialize{
         linkSet[a].push(b);
         linkSet[b].push(a);
 
-        emit Connect(l.linkId, l.userA, l.userB, l.idA, l.idB);
-    }
-
-    function withdraw(address token, address to) public {
-        require(msg.sender == avatarCFO, "AvatarLink: only-avatar-CFO");
-        uint256 amt = IERC20(token).balanceOf(address(this));
-        IERC20(token).transfer(to, amt);
-
-        emit Withdraw(token, to, amt);
+        emit Connect(l.linkId, l.userA, l.userB, l.idA, l.idB, avatarPrice/2);
     }
 }
 
