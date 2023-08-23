@@ -1,6 +1,6 @@
 # **atm-avatar-contract**
 
-## introduction
+## Introduction
 
 Avatar Link is a new Link, different with ATM Link. the link is not a contract, and NFT don't have to deposit on
 any contract. the link just a data struct to record which two Avatar NFT connected.  One Avatar NFT can connect to many
@@ -8,18 +8,18 @@ other Avatar NFT.
 
 
 
-## requirement 
+## Requirement 
 
 1. users buy an Avatar NFT need to pay 2k LUCA, one half of that LUCA will be destroyed, other half as reword return to the NFT holder
 2. link between two Avatar NFT, once link connected never disconnect
 3. link will not affect the NFT normal function(don't have to deposit)
 
-## contract 
+## Contracts API 
 
-#### 1. Avatar.sol 
+## 1. Avatar.sol 
 Avatar NFT contract, base from [ERC721](https://docs.openzeppelin.com/contracts/4.x/api/token/erc721#IERC721) and add below functions.
 
-##### reade function
+### reade function
 1. **Set Revealed** `setRevealed(bool _state)`: `_state` stata of revealed tokenURI, false use the common URI, true use unique URI
 
 2. **Set BaseURI** `setBaseURI(string memory uri)` 
@@ -30,13 +30,13 @@ Avatar NFT contract, base from [ERC721](https://docs.openzeppelin.com/contracts/
 
 5.  **Set Minter** `setMinter(string memory fix)`: only minter can mint NFT, after first NFT be created the Minter need set to AvatarLink contract
 
-##### event 
+### event 
 1. `Transfer(from, to, tokenId)`
 
-#### 2. AvatarLink.sol
+## 2. AvatarLink.sol
 Avatar Link contract, proved link invite, connect functions and some data query functions.
 
-##### core data struct 
+### core data struct 
 ```solidity
      //--- Avatar link information
     uint256 public supply;                                          //amount of links
@@ -58,13 +58,13 @@ Avatar Link contract, proved link invite, connect functions and some data query 
 
 ```
 
-##### write functions
+### write functions
 1. **Connect** `connect(uint256 signId, address inviter, uint256 tokenId, bytes memory signature)`, 
 create connect, before call this function need approve luca for AvatarLink contract, and need provide invite signature .
 
 2. **Withdraw** `withdraw(address token, address to)` withdraw token from contract : `token` is token address, `to` is receiver address
 
-##### read functions 
+### read functions 
 1. **isConnect** `isConnect(uint256 idA, uint256 idB) public view returns(bool)` : check two Avatar NFT tokenId if connected.
 2. **getLinkMSG** `getLinkMSG(uint256 idA, uint256 idB) public view returns(uint256 _linkId, address _userA, address _userB, uint256 _idA, uint256 _idB, uint256 _ivt_tamp, uint256 _cnt_tamp, bool _connect)` : get connect information by two Avatar NFT tokenId
 3. **link** `link(uint256 linkId) public view returns(uint256 _linkId, address _userA, address _userB, uint256 _idA, uint256 _idB, uint256 _ivt_tamp, uint256 _cnt_tamp, bool _connect)` : get connect information by linkId
@@ -73,14 +73,17 @@ create connect, before call this function need approve luca for AvatarLink contr
 6. **getLinkAmount** `getLinkAmount(uint256 tokenId) public view returns(uint256)`: get connected link's amount
 7. **getPrice** `function getPrice(uint256 vaule) public view returns(uint256)`: get Avatar NFT price(LUCA), `vaule` is amount of USD(BUSD)
 
-##### events
+### events
+1. `Connect(uint256 indexed linkId, address userA, address userB, uint256 idA, uint256 idB);` only available before upgrade
+2. `Connect(uint256 indexed linkId, address userA, address userB, uint256 idA, uint256 idB，uint256 rewardIn);`: `rewardIn` is amount of Luca that direct transfer to reward contract, only available after upgrade
 
-1. `Connect(uint256 indexed linkId, address userA, address userB, uint256 idA, uint256 idB，uint256 rewardIn);`: `rewardIn` is amount of Luca that transfer to reward contract
-
+### upgrade changes
+1. reward direct transfer to ATM reward contract.
+2. event of `Connect` add rewardIn.
 
 ## docking & debug
 
-#### blockchain environment
+### blockchain environment
 
 ```js
    Network: BSC-Test
@@ -90,16 +93,16 @@ create connect, before call this function need approve luca for AvatarLink contr
    PancakeRouter:   0xCc7aDc94F3D80127849D2b41b6439b7CF1eB4Ae0
    PancakePair:     0x36b20fDB728771484bd7F9E5b124A19272c1FDC0
    Avatar_NFT:      0x90380308827ab3685B776588c7eB880014533506
-   AvatarLink:      0x982f67Fde928CC1Bb630e84e7b75fE03032B6767
+   AvatarLink:      0x982f67Fde928CC1Bb630e84e7b75fE03032B6767    
+   //AvatarLink deploy at block: 31066831
+   //AvatarLink upgrade at block: 
+   //Total reward after upgrade: 
+   
 ```
 
-#### workflow
+## workflow
 
-##### invite-workflow
-    coming soon ...
-
-
-##### connect-workflow
+### connect-workflow
 `precondition`: Make sure you have enough TBNB and LUCA on your account(testnet NFT price 10LUCA)
 
 1. **Authorize to AvatarLink contract**

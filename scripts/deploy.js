@@ -13,11 +13,11 @@ async function main() {
   const limit = 2000;
 
   console.log("\n\n\n########### deploy contracts ################\n\n\n");
-  const avatar = await ethers.getContractFactory("Avatar");
+  const avatar = await hre.ethers.getContractFactory("Avatar");
   const Avatar = await avatar.deploy("Avatar NFT Test","AVT",luca, price, limit);
   console.log(`Avatar NFT Contract deployed, address :${Avatar.address}`);
 
-  const avatarLinkPorxy = await ethers.getContractFactory("AvatarLinkProxy");
+  const avatarLinkPorxy = await hre.ethers.getContractFactory("AvatarLinkProxy");
   const AvatarLinkPorxy = await avatarLinkPorxy.deploy(Avatar.address);
   console.log(`AvatarLinkPorxy Contract deployed, address :${AvatarLinkPorxy.address}, logicAddress : ${AvatarLinkPorxy.logic()}`);
 
