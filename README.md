@@ -93,10 +93,11 @@ create connect, before call this function need approve luca for AvatarLink contr
    PancakeRouter:   0xCc7aDc94F3D80127849D2b41b6439b7CF1eB4Ae0
    PancakePair:     0x36b20fDB728771484bd7F9E5b124A19272c1FDC0
    Avatar_NFT:      0x90380308827ab3685B776588c7eB880014533506
-   AvatarLink:      0x982f67Fde928CC1Bb630e84e7b75fE03032B6767    
+   AvatarLink:      0x982f67Fde928CC1Bb630e84e7b75fE03032B6767
+   Incentive:       0xA711ae1bdb635ACEC1Dd5E1a5d670dDb2858ae63    //ATM reward contract
    //AvatarLink deploy at block: 31066831
-   //AvatarLink upgrade at block: 
-   //Total reward after upgrade: 
+   //AvatarLink upgrade at block: 32716893 
+   //Total reward before upgrade: 1335524336242067420820          //1,335.52433624206742082 LUCA
    
 ```
 
