@@ -34,7 +34,7 @@ Avatar NFT contract, base from [ERC721](https://docs.openzeppelin.com/contracts/
 1. `Transfer(from, to, tokenId)`
 
 ## 2. AvatarLink.sol
-Avatar Link contract, proved link invite, connect functions and some data query functions.
+Avatar Link contract, proved link invite, connect functions and some data query functions. [upgrade operation](./upgrade.md)
 
 ### core data struct 
 ```solidity
@@ -96,8 +96,8 @@ create connect, before call this function need approve luca for AvatarLink contr
    AvatarLink:      0x982f67Fde928CC1Bb630e84e7b75fE03032B6767
    Incentive:       0xA711ae1bdb635ACEC1Dd5E1a5d670dDb2858ae63    //ATM reward contract
    //AvatarLink deploy at block: 31066831
-   //AvatarLink upgrade at block: 32716893 
-   //Total reward before upgrade: 1335524336242067420820          //1,335.52433624206742082 LUCA
+   //AvatarLink upgrade.md at block: 32716893 
+   //Total reward before upgrade.md: 1335524336242067420820          //1,335.52433624206742082 LUCA
    
 ```
 
@@ -123,3 +123,5 @@ create connect, before call this function need approve luca for AvatarLink contr
 ## third-party interfaces
 1. [bscscan-api](https://docs.bscscan.com/)(Including asset statistics and NFT holding list)
 2. [web3.js-doc](https://web3js.readthedocs.io/)
+
+

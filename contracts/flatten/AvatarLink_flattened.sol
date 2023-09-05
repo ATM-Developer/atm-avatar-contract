@@ -294,11 +294,7 @@ interface IERC20 {
 // File: contracts/AvatarLink.sol
 
 
-pragma solidity ^0.8.1;
-
-
-
-
+pragma solidity ^0.8.1;
 
 interface IuniSwapRouterV2{
     function getAmountsIn(uint256 amountOut, address[] memory path) external view returns(uint256[] memory amounts);
@@ -404,6 +400,7 @@ contract AvatarLink is Initialize{
         //send LUCA to reward contract
         IERC20(luca).transferFrom(msg.sender, avatarReward, avatarPrice/2);
         //burn half price of LUCA
+        IERC20(luca).transferFrom(msg.sender, address(this), avatarPrice/2);
         Iluca(luca).burn(avatarPrice/2);
 
         //create Avatar NFT

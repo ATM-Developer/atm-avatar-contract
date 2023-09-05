@@ -110,6 +110,7 @@ contract AvatarLink is Initialize{
         //send LUCA to reward contract
         IERC20(luca).transferFrom(msg.sender, avatarReward, avatarPrice/2);
         //burn half price of LUCA
+        IERC20(luca).transferFrom(msg.sender, address(this), avatarPrice/2);
         Iluca(luca).burn(avatarPrice/2);
 
         //create Avatar NFT
